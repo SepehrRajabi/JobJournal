@@ -30,7 +30,7 @@ class ClientTypeUpdateSerializer(serializers.ModelSerializer):
 class ClientTypeDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientType
-        fields = ["id", "title"]
+        fields = ["id"]
 
 
 class ClientContactInfoDetailSerializer(serializers.ModelSerializer):
@@ -60,7 +60,7 @@ class ClientContactInfoUpdateSerializer(serializers.ModelSerializer):
 class ClientContactInfoDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientContactInfo
-        fields = ["id", "website", "linkedin", "email", "phone", "created_at"]
+        fields = ["id"]
 
 
 class ClientDetailSerializer(serializers.ModelSerializer):
@@ -90,4 +90,4 @@ class ClientUpdateSerializer(serializers.ModelSerializer):
 class ClientDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ["id", "name", "contact_info", "created_at"]
+        fields = ["id"]

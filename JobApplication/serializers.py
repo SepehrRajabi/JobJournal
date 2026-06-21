@@ -38,7 +38,7 @@ class OppurtunityUpdateSerializer(serializers.ModelSerializer):
 class OppurtunityDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Oppurtunity
-        fields = ["id", "title"]
+        fields = ["id"]
 
 
 class JobApplicationStatusDetailSerializer(serializers.ModelSerializer):
@@ -68,7 +68,7 @@ class JobApplicationStatusUpdateSerializer(serializers.ModelSerializer):
 class JobApplicationStatusDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplicationStatus
-        fields = ["id", "title"]
+        fields = ["id"]
 
 
 class JobApplicationDetailSerializer(serializers.ModelSerializer):
@@ -182,28 +182,7 @@ class JobApplicationUpdateSerializer(serializers.ModelSerializer):
 class JobApplicationDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplication
-        fields = [
-            "id",
-            "user",
-            "client",
-            "oppurtunity",
-            "title",
-            "location",
-            "employment_type",
-            "work_mode",
-            "salary_min",
-            "salary_max",
-            "currency",
-            "source",
-            "job_url",
-            "status",
-            "applied_at",
-            "deadline",
-            "resume",
-            "cover_letter",
-            "notes",
-            "created_at",
-        ]
+        fields = ["id"]
 
 
 class InterviewStageStatusDetailSerializer(serializers.ModelSerializer):
@@ -233,7 +212,7 @@ class InterviewStageStatusUpdateSerializer(serializers.ModelSerializer):
 class InterviewStageStatusDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewStageStatus
-        fields = ["id", "title"]
+        fields = ["id"]
 
 
 class InterviewStageTypeDetailSerializer(serializers.ModelSerializer):
@@ -263,7 +242,7 @@ class InterviewStageTypeUpdateSerializer(serializers.ModelSerializer):
 class InterviewStageTypeDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewStageType
-        fields = ["id", "title"]
+        fields = ["id"]
 
 
 class InterviewResultDetailSerializer(serializers.ModelSerializer):
@@ -293,7 +272,7 @@ class InterviewResultUpdateSerializer(serializers.ModelSerializer):
 class InterviewResultDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewResult
-        fields = ["id", "title"]
+        fields = ["id"]
 
 
 class InterviewStageDetailSerializer(serializers.ModelSerializer):
@@ -379,18 +358,4 @@ class InterviewStageUpdateSerializer(serializers.ModelSerializer):
 class InterviewStageDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewStage
-        fields = [
-            "id",
-            "application",
-            "stage_order",
-            "stage_type",
-            "title",
-            "status",
-            "scheduled_at",
-            "completed_at",
-            "duration_minutes",
-            "meeting_link",
-            "location",
-            "result",
-            "notes",
-        ]
+        fields = ["id"]
