@@ -1,8 +1,8 @@
+from uuid import uuid4
+
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models import UniqueConstraint, Q, CheckConstraint
-
-from uuid import uuid4
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 
 
 class ClientType(models.Model):
@@ -53,7 +53,7 @@ class ClientContactInfo(models.Model):
     created_at = models.DateField(auto_now_add=True)
 
     class Meta:
-        constraints = [
+        constraints = [  # noqa: RUF012
             UniqueConstraint(
                 name="unique_website",
                 fields=["website"],

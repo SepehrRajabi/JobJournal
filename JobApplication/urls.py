@@ -31,10 +31,10 @@ from .views import (
     JobApplicationStatusesListAPIView,
     JobApplicationStatusUpdateAPIView,
     JobApplicationUpdateAPIView,
+    OppurtunitiesListAPIView,
     OppurtunityCreateAPIView,
     OppurtunityDeleteAPIView,
     OppurtunityDetailAPIView,
-    OppurtunitiesListAPIView,
     OppurtunityUpdateAPIView,
 )
 

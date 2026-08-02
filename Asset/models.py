@@ -1,6 +1,7 @@
-from django.db import models
-from django.conf import settings
 from uuid import uuid4
+
+from django.conf import settings
+from django.db import models
 
 
 def create_asset_upload_path(instance, filename):

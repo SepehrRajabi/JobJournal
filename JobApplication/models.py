@@ -1,12 +1,11 @@
-from django.db import models
-from django.conf import settings
-
-from simple_history.models import HistoricalRecords
-
 from uuid import uuid4
 
-from Client.models import Client
+from django.conf import settings
+from django.db import models
+from simple_history.models import HistoricalRecords
+
 from Asset.models import AssetGroup
+from Client.models import Client
 
 
 class Oppurtunity(models.Model):

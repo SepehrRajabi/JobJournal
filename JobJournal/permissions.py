@@ -1,10 +1,9 @@
-from typing import Optional
-from django.views.generic import View
-from rest_framework.permissions import BasePermission
-from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import Permission
 from django.db.models import Q
 from django.db.models.base import Model
+from django.views.generic import View
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import BasePermission
 
 from User.models import User
 
@@ -24,7 +23,7 @@ class BaseResourcePermission(BasePermission):
 
         return mapping[method.upper()]
 
-    def _get_model_from_view(self, view: View) -> Optional[Model]:
+    def _get_model_from_view(self, view: View) -> Model | None:
         return (
             getattr(view, "permission_model", None)
             or getattr(view, "queryset", None)
