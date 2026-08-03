@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AssetType, Document, AssetGroup
+from .models import AssetGroup, AssetType, Document
 
 
 class AssetTypeInAdmin(admin.ModelAdmin):

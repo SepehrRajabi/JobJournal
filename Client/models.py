@@ -53,7 +53,7 @@ class ClientContactInfo(models.Model):
     created_at = models.DateField(auto_now_add=True)
 
     class Meta:
-        constraints = [  # noqa: RUF012
+        constraints = [
             UniqueConstraint(
                 name="unique_website",
                 fields=["website"],

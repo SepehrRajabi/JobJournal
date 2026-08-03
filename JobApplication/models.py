@@ -22,6 +22,9 @@ class Oppurtunity(models.Model):
     def __str__(self):
         return f"{self.title}"
 
+    class Meta:
+        verbose_name_plural = "Oppurtunities"
+
 
 class JobApplicationStatus(models.Model):
     id = models.UUIDField(
@@ -36,6 +39,9 @@ class JobApplicationStatus(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+
+    class Meta:
+        verbose_name_plural = "Job Application Statuses"
 
 
 class JobApplication(models.Model):
@@ -147,6 +153,9 @@ class InterviewStageStatus(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+
+    class Meta:
+        verbose_name_plural = "Interview Stage Statuses"
 
 
 class InterviewStageType(models.Model):
