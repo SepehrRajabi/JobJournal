@@ -117,13 +117,15 @@ class VersionedDocument(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # ordering = ["-created_at"]
         constraints = [
             models.UniqueConstraint(
                 fields=["asset_group", "document"],
                 name="unique_asset_group_document",
             )
         ]
+
+    def __str__(self) -> str:
+        return f"{self.asset_group.name} - {self.document.title}"
 
 
 class AssetGroup(models.Model):
