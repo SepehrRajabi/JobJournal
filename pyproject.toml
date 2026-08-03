@@ -47,3 +47,5 @@ package = false
 
 [tool.ruff.lint]
 ignore = ["RUF012"]
+
+[tool.ruff.lint.isort]
