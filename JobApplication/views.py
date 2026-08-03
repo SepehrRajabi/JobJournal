@@ -1,4 +1,8 @@
+from django.db.models import F
+from django.utils import timezone
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 from .models import (
     InterviewResult,
@@ -40,10 +44,10 @@ from .serializers import (
     JobApplicationStatusesListSerializer,
     JobApplicationStatusUpdateSerializer,
     JobApplicationUpdateSerializer,
+    OppurtunitiesListSerializer,
     OppurtunityCreateSerializer,
     OppurtunityDeleteSerializer,
     OppurtunityDetailSerializer,
-    OppurtunitiesListSerializer,
     OppurtunityUpdateSerializer,
 )
 
@@ -221,3 +225,24 @@ class InterviewStageUpdateAPIView(generics.UpdateAPIView):
 class InterviewStageDeleteAPIView(generics.DestroyAPIView):
     queryset = InterviewStage.objects.all()
     serializer_class = InterviewStageDeleteSerializer
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="scheduled_at",
+            type=OpenApiTypes.DATETIME,
+            description="The date the interview is scheduled at",
+        ),
+    ]
+)
+class UpcomingInterviewsListAPIView(generics.ListAPIView):
+    serializer_class = InterviewStagesListSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self):
+        return InterviewStage.objects.filter(
+            user=self.request.user, scheduled_at__gte=timezone.now()
+        ).order_by(F("scheduled_at").desc(nulls_last=True))

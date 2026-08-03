@@ -36,6 +36,7 @@ from .views import (
     OppurtunityDeleteAPIView,
     OppurtunityDetailAPIView,
     OppurtunityUpdateAPIView,
+    UpcomingInterviewsListAPIView,
 )
 
 app_name = "JobApplication"
@@ -215,5 +216,10 @@ urlpatterns = [
         "interview-stages/delete/<uuid:pk>/",
         InterviewStageDeleteAPIView.as_view(),
         name="interview-stage-delete",
+    ),
+    path(
+        "upcoming-interviews/",
+        UpcomingInterviewsListAPIView.as_view(),
+        name="upcoming-interviews-list",
     ),
 ]
