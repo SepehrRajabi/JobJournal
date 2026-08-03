@@ -243,6 +243,17 @@ class UpcomingInterviewsListAPIView(generics.ListAPIView):
     ]
 
     def get_queryset(self):
-        return InterviewStage.objects.filter(
-            user=self.request.user, scheduled_at__gte=timezone.now()
-        ).order_by(F("scheduled_at").desc(nulls_last=True))
+        stages = (
+            InterviewStage.objects.select_related(
+                "application", "stage_type", "status", "result"
+            )
+            .filter(
+                application__user=self.request.user, scheduled_at__gte=timezone.now()
+            )
+            .order_by(F("scheduled_at").desc(nulls_last=True))
+        )
+
+        if scheduled_at := self.request.query_params.get("scheduled_at"):
+            stages = stages.filter(scheduled_at=scheduled_at)
+
+        return stages
