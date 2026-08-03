@@ -3,6 +3,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Permission
 
+from JobApplication.models import (
+    JobApplication,
+)
+
 User = get_user_model()
 
 
@@ -12,6 +16,17 @@ User = get_user_model()
 admin.site.site_title = "JobJournal Site Admin (DEV)"
 admin.site.site_header = "JobJournal Administration"
 admin.site.index_title = "JobJournal Site"
+
+
+class JobApplicationInline(admin.StackedInline):
+    model = JobApplication
+    extra = 1
+    readonly_fields = (
+        "id",
+        "created_at",
+    )
+    can_delete = False
+    show_change_link = True
 
 
 class UserInAdmin(UserAdmin):
@@ -83,6 +98,8 @@ class UserInAdmin(UserAdmin):
 
     ordering = ("-last_name",)
     filter_horizontal = ()
+
+    inlines = [JobApplicationInline]
 
 
 admin.site.register(User, UserInAdmin)
