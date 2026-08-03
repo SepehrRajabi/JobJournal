@@ -44,14 +44,18 @@ class Document(models.Model):
     )
 
     asset_type = models.ForeignKey(
-        AssetType, blank=True, null=True, on_delete=models.SET_NULL
+        AssetType,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="documents",
     )
     file = models.FileField(null=True, blank=True, upload_to=create_asset_upload_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.file.name}"
+        return f"{self.file.name} {self.user.first_name} {self.user.last_name}"
 
 
 class AssetGroup(models.Model):
