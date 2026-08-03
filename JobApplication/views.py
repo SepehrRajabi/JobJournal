@@ -232,7 +232,7 @@ class InterviewStageDeleteAPIView(generics.DestroyAPIView):
         OpenApiParameter(
             name="scheduled_at",
             type=OpenApiTypes.DATETIME,
-            description="The date the interview is scheduled at",
+            description="The date the interview is scheduled for",
         ),
     ]
 )
