@@ -24,12 +24,27 @@ class BaseResourcePermission(BasePermission):
         return mapping[method.upper()]
 
     def _get_model_from_view(self, view: View) -> Model | None:
-        return (
-            getattr(view, "permission_model", None)
-            or getattr(view, "queryset", None)
-            or getattr(view, "get_queryset", None)
-            or getattr(view, "serializer_class", None)
-        ).model
+        # Try permission_model first
+        if hasattr(view, "permission_model") and view.permission_model:
+            return view.permission_model
+        
+        # Try queryset
+        if hasattr(view, "queryset") and view.queryset is not None:
+            return view.queryset.model
+        
+        # Try get_queryset method
+        if hasattr(view, "get_queryset") and callable(view.get_queryset):
+            try:
+                queryset = view.get_queryset()
+                return queryset.model
+            except Exception:
+                pass
+        
+        # Try serializer_class
+        if hasattr(view, "serializer_class") and view.serializer_class:
+            return view.serializer_class.Meta.model
+        
+        return None
 
     def get_action_and_model(self, view: View) -> tuple[str, Model]:
         action = getattr(view, "action", None)
