@@ -20,7 +20,7 @@ urlpatterns = [
         name="user-update",
     ),
     path(
-        "users/delete/<uuid:pk>/",
+        "users/delete/",
         UserDeleteAPIView.as_view(),
         name="user-delete",
     ),
