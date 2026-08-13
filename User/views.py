@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 from .models import User
 from .serializers import (
@@ -31,5 +32,11 @@ class UserUpdateAPIView(generics.UpdateAPIView):
 
 
 class UserDeleteAPIView(generics.DestroyAPIView):
-    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = UserDeleteSerializer
+
+    def get_queryset(self):
+        return User.objects.filter(pk=self.request.user.pk)
+
+    def get_object(self):
+        return self.get_queryset().first()
