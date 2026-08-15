@@ -8,7 +8,7 @@ from Asset.models import AssetGroup
 from Client.models import Client
 
 
-class Oppurtunity(models.Model):
+class Opportunity(models.Model):
     id = models.UUIDField(
         default=uuid4,
         editable=False,
@@ -23,7 +23,7 @@ class Oppurtunity(models.Model):
         return f"{self.title}"
 
     class Meta:
-        verbose_name_plural = "Oppurtunities"
+        verbose_name_plural = "Opportunities"
 
 
 class JobApplicationStatus(models.Model):
@@ -42,6 +42,24 @@ class JobApplicationStatus(models.Model):
 
     class Meta:
         verbose_name_plural = "Job Application Statuses"
+
+
+class JobApplicationTag(models.Model):
+    id = models.UUIDField(
+        default=uuid4,
+        editable=False,
+        null=False,
+        primary_key=True,
+        unique=True,
+        db_index=True,
+    )
+    title = models.CharField(max_length=100, null=True, blank=True, unique=True)
+
+    def __str__(self):
+        return f"{self.title}"
+
+    class Meta:
+        verbose_name_plural = "Job Application Tags"
 
 
 class JobApplication(models.Model):
@@ -64,10 +82,10 @@ class JobApplication(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="job_applicatons",
+        related_name="job_applications",
     )
-    oppurtunity = models.ForeignKey(
-        Oppurtunity,
+    opportunity = models.ForeignKey(
+        Opportunity,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -130,11 +148,15 @@ class JobApplication(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    tags = models.ManyToManyField(
+        JobApplicationTag, blank=True, related_name="job_applications"
+    )
+
     notes = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(m2m_fields=[tags])
 
     def __str__(self):
         return f"{self.title}"
