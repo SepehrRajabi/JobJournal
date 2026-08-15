@@ -1,4 +1,9 @@
+from django.contrib.auth import get_user_model
+from django.db.models import F
 from rest_framework import serializers
+from rest_framework.fields import UUIDField
+
+from User.serializers import UserDetailSerializer
 
 from .models import (
     InterviewResult,
@@ -7,37 +12,39 @@ from .models import (
     InterviewStageType,
     JobApplication,
     JobApplicationStatus,
-    Oppurtunity,
+    Opportunity,
 )
 
+User = get_user_model()
 
-class OppurtunityDetailSerializer(serializers.ModelSerializer):
+
+class OpportunityDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Oppurtunity
+        model = Opportunity
         fields = ["id", "title"]
 
 
 class OppurtunitiesListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Oppurtunity
+        model = Opportunity
         fields = ["id", "title"]
 
 
-class OppurtunityCreateSerializer(serializers.ModelSerializer):
+class OpportunityCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Oppurtunity
-        fields = ["id", "title"]
+        model = Opportunity
+        fields = ["title"]
 
 
-class OppurtunityUpdateSerializer(serializers.ModelSerializer):
+class OpportunityUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Oppurtunity
-        fields = ["id", "title"]
+        model = Opportunity
+        fields = ["title"]
 
 
-class OppurtunityDeleteSerializer(serializers.ModelSerializer):
+class OpportunityDeleteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Oppurtunity
+        model = Opportunity
         fields = ["id"]
 
 
@@ -56,13 +63,13 @@ class JobApplicationStatusesListSerializer(serializers.ModelSerializer):
 class JobApplicationStatusCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplicationStatus
-        fields = ["id", "title"]
+        fields = ["title"]
 
 
 class JobApplicationStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplicationStatus
-        fields = ["id", "title"]
+        fields = ["title"]
 
 
 class JobApplicationStatusDeleteSerializer(serializers.ModelSerializer):
@@ -72,13 +79,22 @@ class JobApplicationStatusDeleteSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationDetailSerializer(serializers.ModelSerializer):
+    opportunity = OpportunityDetailSerializer(read_only=True)
+    status = JobApplicationStatusDetailSerializer(read_only=True)
+    user = UserDetailSerializer(read_only=True)
+    interviews = serializers.SerializerMethodField(read_only=True)
+
+    def get_interviews(self, obj):
+        interviews = obj.interview_stages.order_by(F("stage_order").asc())
+        return InterviewStagesListSerializer(interviews, many=True).data
+
     class Meta:
         model = JobApplication
         fields = [
             "id",
             "user",
             "client",
-            "oppurtunity",
+            "opportunity",
             "title",
             "location",
             "employment_type",
@@ -86,6 +102,7 @@ class JobApplicationDetailSerializer(serializers.ModelSerializer):
             "salary_min",
             "salary_max",
             "currency",
+            "interviews",
             "source",
             "job_url",
             "status",
@@ -99,13 +116,17 @@ class JobApplicationDetailSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationsListSerializer(serializers.ModelSerializer):
+    opportunity = OpportunityDetailSerializer(read_only=True)
+    status = JobApplicationStatusDetailSerializer(read_only=True)
+    user = UserDetailSerializer(read_only=True)
+
     class Meta:
         model = JobApplication
         fields = [
             "id",
             "user",
             "client",
-            "oppurtunity",
+            "opportunity",
             "title",
             "location",
             "employment_type",
@@ -126,13 +147,32 @@ class JobApplicationsListSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationCreateSerializer(serializers.ModelSerializer):
+    opportunity = serializers.PrimaryKeyRelatedField(
+        queryset=Opportunity.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    status = serializers.PrimaryKeyRelatedField(
+        queryset=JobApplicationStatus.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
     class Meta:
         model = JobApplication
         fields = [
             "id",
             "user",
             "client",
-            "oppurtunity",
+            "opportunity",
             "title",
             "location",
             "employment_type",
@@ -153,13 +193,32 @@ class JobApplicationCreateSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationUpdateSerializer(serializers.ModelSerializer):
+    opportunity = serializers.PrimaryKeyRelatedField(
+        queryset=Opportunity.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    status = serializers.PrimaryKeyRelatedField(
+        queryset=JobApplicationStatus.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
     class Meta:
         model = JobApplication
         fields = [
             "id",
             "user",
             "client",
-            "oppurtunity",
+            "opportunity",
             "title",
             "location",
             "employment_type",
@@ -276,6 +335,10 @@ class InterviewResultDeleteSerializer(serializers.ModelSerializer):
 
 
 class InterviewStageDetailSerializer(serializers.ModelSerializer):
+    stage_type = InterviewStageTypeDetailSerializer(read_only=True)
+    status = InterviewStageStatusDetailSerializer(read_only=True)
+    result = InterviewResultDetailSerializer(read_only=True)
+
     class Meta:
         model = InterviewStage
         fields = [
@@ -296,6 +359,10 @@ class InterviewStageDetailSerializer(serializers.ModelSerializer):
 
 
 class InterviewStagesListSerializer(serializers.ModelSerializer):
+    stage_type = InterviewStageTypeDetailSerializer(read_only=True)
+    status = InterviewStageStatusDetailSerializer(read_only=True)
+    result = InterviewResultDetailSerializer(read_only=True)
+
     class Meta:
         model = InterviewStage
         fields = [
@@ -316,6 +383,25 @@ class InterviewStagesListSerializer(serializers.ModelSerializer):
 
 
 class InterviewStageCreateSerializer(serializers.ModelSerializer):
+    stage_type = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewStageType.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    status = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewStageStatus.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    result = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewResult.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
     class Meta:
         model = InterviewStage
         fields = [
@@ -336,6 +422,25 @@ class InterviewStageCreateSerializer(serializers.ModelSerializer):
 
 
 class InterviewStageUpdateSerializer(serializers.ModelSerializer):
+    stage_type = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewStageType.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    status = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewStageStatus.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    result = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewResult.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
     class Meta:
         model = InterviewStage
         fields = [
