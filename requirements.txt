@@ -13,13 +13,13 @@ attrs==26.1.0 \
     #   jobjournal
     #   jsonschema
     #   referencing
-boto3==1.43.70 \
-    --hash=sha256:4f1e16b9eebbad3f312bb6fbf7685d40abdd52a691485cb9f09e7df60d912b41 \
-    --hash=sha256:b9399cce51bec9552e61a6b85015c42dea68752e79c00a7005d84eaf7ee15fef
+boto3==1.43.72 \
+    --hash=sha256:6280ce03cc85e9110fd9fb7e2fbf11eae0b1177cb041a0d69aa88edc9d178cf9 \
+    --hash=sha256:f1bbbad5ed8d8a8c64edb0cd092dc443c95a85623b2ac88b6f6d633717605f00
     # via jobjournal
-botocore==1.43.70 \
-    --hash=sha256:95bc23a6472f8876349ae334b526e66006f6cf3c87bf39d3e9f057dc8c2eb85f \
-    --hash=sha256:a7bebdd0b1c8265e72759a4f7f61e9e43d57968b2c2a5e1e7b350d0a1e3ce81c
+botocore==1.43.72 \
+    --hash=sha256:1b878c69081e8e9d55aa4c0d85683e7b07f0e274a5554662f9507a46641be3d2 \
+    --hash=sha256:de5a1bcf8d7602c6cefc15016f15dad82981e339192531f31fa9483e11feea47
     # via
     #   boto3
     #   jobjournal
