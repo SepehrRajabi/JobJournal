@@ -8,17 +8,17 @@ from .models import (
     InterviewStageType,
     JobApplication,
     JobApplicationStatus,
-    Oppurtunity,
+    Opportunity,
 )
 
 
-class OppurtunityInAdmin(admin.ModelAdmin):
+class OpportunityInAdmin(admin.ModelAdmin):
     list_display = ["id", "title"]
     search_fields = ["title"]
     ordering = ["title"]
 
 
-admin.site.register(Oppurtunity, OppurtunityInAdmin)
+admin.site.register(Opportunity, OpportunityInAdmin)
 
 
 class JobApplicationStatusInAdmin(admin.ModelAdmin):
@@ -103,10 +103,11 @@ class JobApplicationInAdmin(SimpleHistoryAdmin):
         "user__email",
         "client__name",
     ]
+
     readonly_fields = ["id", "created_at"]
     autocomplete_fields = [
         "user",
-        "oppurtunity",
+        "opportunity",
         "status",
         "resume",
         "cover_letter",
@@ -128,7 +129,7 @@ class JobApplicationInAdmin(SimpleHistoryAdmin):
             {
                 "fields": (
                     "client",
-                    "oppurtunity",
+                    "opportunity",
                     "location",
                     "employment_type",
                     "work_mode",
@@ -154,6 +155,7 @@ class JobApplicationInAdmin(SimpleHistoryAdmin):
                     "job_url",
                     "applied_at",
                     "deadline",
+                    "tags",
                 ),
             },
         ),
