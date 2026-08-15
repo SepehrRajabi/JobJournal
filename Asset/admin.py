@@ -59,7 +59,7 @@ class VersionedDocumentInAdmin(admin.ModelAdmin):
         "created_at",
     ]
 
-    ordering = ["updated_at", "created_at"]
+    ordering = ["created_at"]
 
 
 admin.site.register(VersionedDocument, VersionedDocumentInAdmin)
@@ -75,7 +75,7 @@ class AssetGroupInAdmin(admin.ModelAdmin):
         "name",
     ]
 
-    filter_horizontal = ["assets"]
+    # filter_horizontal = ["assets"]
 
 
 admin.site.register(AssetGroup, AssetGroupInAdmin)
