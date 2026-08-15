@@ -30,12 +30,13 @@ from .views import (
     JobApplicationStatusDetailAPIView,
     JobApplicationStatusesListAPIView,
     JobApplicationStatusUpdateAPIView,
+    JobApplicationTimelineAPIView,
     JobApplicationUpdateAPIView,
+    OpportunityCreateAPIView,
+    OpportunityDeleteAPIView,
+    OpportunityDetailAPIView,
+    OpportunityUpdateAPIView,
     OppurtunitiesListAPIView,
-    OppurtunityCreateAPIView,
-    OppurtunityDeleteAPIView,
-    OppurtunityDetailAPIView,
-    OppurtunityUpdateAPIView,
     UpcomingInterviewsListAPIView,
 )
 
@@ -49,23 +50,23 @@ urlpatterns = [
     ),
     path(
         "oppurtunities/create/",
-        OppurtunityCreateAPIView.as_view(),
-        name="oppurtunity-create",
+        OpportunityCreateAPIView.as_view(),
+        name="Opportunity-create",
     ),
     path(
         "oppurtunities/<uuid:pk>/",
-        OppurtunityDetailAPIView.as_view(),
-        name="oppurtunity-detail",
+        OpportunityDetailAPIView.as_view(),
+        name="Opportunity-detail",
     ),
     path(
         "oppurtunities/update/<uuid:pk>/",
-        OppurtunityUpdateAPIView.as_view(),
-        name="oppurtunity-update",
+        OpportunityUpdateAPIView.as_view(),
+        name="Opportunity-update",
     ),
     path(
         "oppurtunities/delete/<uuid:pk>/",
-        OppurtunityDeleteAPIView.as_view(),
-        name="oppurtunity-delete",
+        OpportunityDeleteAPIView.as_view(),
+        name="Opportunity-delete",
     ),
     path(
         "job-application-statuses/",
@@ -221,5 +222,10 @@ urlpatterns = [
         "upcoming-interviews/",
         UpcomingInterviewsListAPIView.as_view(),
         name="upcoming-interviews-list",
+    ),
+    path(
+        "job-application/history/<uuid:pk>/",
+        JobApplicationTimelineAPIView.as_view(),
+        name="job-application-history",
     ),
 ]

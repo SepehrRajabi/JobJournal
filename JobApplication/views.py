@@ -1,8 +1,9 @@
 from django.db.models import F
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .models import (
     InterviewResult,
@@ -11,7 +12,7 @@ from .models import (
     InterviewStageType,
     JobApplication,
     JobApplicationStatus,
-    Oppurtunity,
+    Opportunity,
 )
 from .serializers import (
     InterviewResultCreateSerializer,
@@ -44,37 +45,38 @@ from .serializers import (
     JobApplicationStatusesListSerializer,
     JobApplicationStatusUpdateSerializer,
     JobApplicationUpdateSerializer,
+    OpportunityCreateSerializer,
+    OpportunityDeleteSerializer,
+    OpportunityDetailSerializer,
+    OpportunityUpdateSerializer,
     OppurtunitiesListSerializer,
-    OppurtunityCreateSerializer,
-    OppurtunityDeleteSerializer,
-    OppurtunityDetailSerializer,
-    OppurtunityUpdateSerializer,
 )
+from .utils import get_job_application_history
 
 
-class OppurtunityDetailAPIView(generics.RetrieveAPIView):
-    queryset = Oppurtunity.objects.all()
-    serializer_class = OppurtunityDetailSerializer
+class OpportunityDetailAPIView(generics.RetrieveAPIView):
+    queryset = Opportunity.objects.all()
+    serializer_class = OpportunityDetailSerializer
 
 
 class OppurtunitiesListAPIView(generics.ListAPIView):
-    queryset = Oppurtunity.objects.all()
+    queryset = Opportunity.objects.all()
     serializer_class = OppurtunitiesListSerializer
 
 
-class OppurtunityCreateAPIView(generics.CreateAPIView):
-    queryset = Oppurtunity.objects.all()
-    serializer_class = OppurtunityCreateSerializer
+class OpportunityCreateAPIView(generics.CreateAPIView):
+    queryset = Opportunity.objects.all()
+    serializer_class = OpportunityCreateSerializer
 
 
-class OppurtunityUpdateAPIView(generics.UpdateAPIView):
-    queryset = Oppurtunity.objects.all()
-    serializer_class = OppurtunityUpdateSerializer
+class OpportunityUpdateAPIView(generics.UpdateAPIView):
+    queryset = Opportunity.objects.all()
+    serializer_class = OpportunityUpdateSerializer
 
 
-class OppurtunityDeleteAPIView(generics.DestroyAPIView):
-    queryset = Oppurtunity.objects.all()
-    serializer_class = OppurtunityDeleteSerializer
+class OpportunityDeleteAPIView(generics.DestroyAPIView):
+    queryset = Opportunity.objects.all()
+    serializer_class = OpportunityDeleteSerializer
 
 
 class JobApplicationStatusDetailAPIView(generics.RetrieveAPIView):
@@ -243,7 +245,7 @@ class UpcomingInterviewsListAPIView(generics.ListAPIView):
     ]
 
     def get_queryset(self):
-        stages = (
+        interviews = (
             InterviewStage.objects.select_related(
                 "application", "stage_type", "status", "result"
             )
@@ -254,6 +256,32 @@ class UpcomingInterviewsListAPIView(generics.ListAPIView):
         )
 
         if scheduled_at := self.request.query_params.get("scheduled_at"):
-            stages = stages.filter(scheduled_at=scheduled_at)
+            interviews = interviews.filter(scheduled_at=scheduled_at)
 
-        return stages
+        return interviews
+
+
+class JobApplicationTimelineAPIView(generics.RetrieveAPIView):
+    serializer_class = JobApplicationDetailSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self):
+        return JobApplication.objects.filter(
+            user=self.request.user, id=self.kwargs[self.lookup_field]
+        )
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_queryset().first()
+
+        if not instance:
+            return Response(
+                {"detail": "Job application not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(
+            get_job_application_history(job_application=instance),
+            status=status.HTTP_200_OK,
+        )
