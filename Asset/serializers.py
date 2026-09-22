@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import UUIDField
 
 from .models import AssetGroup, AssetType, Document
 
@@ -97,6 +98,19 @@ class DocumentsListSerializer(serializers.ModelSerializer):
 
 
 class DocumentCreateSerializer(serializers.ModelSerializer):
+    asset_type = serializers.PrimaryKeyRelatedField(
+        queryset=AssetType.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    asset_group = serializers.PrimaryKeyRelatedField(
+        queryset=AssetGroup.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
     class Meta:
         model = Document
         fields = [
@@ -112,6 +126,19 @@ class DocumentCreateSerializer(serializers.ModelSerializer):
 
 
 class DocumentUpdateSerializer(serializers.ModelSerializer):
+    asset_type = serializers.PrimaryKeyRelatedField(
+        queryset=AssetType.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    asset_group = serializers.PrimaryKeyRelatedField(
+        queryset=AssetGroup.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
     class Meta:
         model = Document
         fields = [
