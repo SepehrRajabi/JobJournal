@@ -54,6 +54,12 @@ class JobApplicationTag(models.Model):
         db_index=True,
     )
     title = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    color = models.CharField(max_length=7, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.color and not self.color.startswith("#"):
+            self.color = f"#{self.color}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title}"
