@@ -27,23 +27,23 @@ class BaseResourcePermission(BasePermission):
         # Try permission_model first
         if hasattr(view, "permission_model") and view.permission_model:
             return view.permission_model
-        
+
         # Try queryset
         if hasattr(view, "queryset") and view.queryset is not None:
             return view.queryset.model
-        
+
         # Try get_queryset method
         if hasattr(view, "get_queryset") and callable(view.get_queryset):
             try:
                 queryset = view.get_queryset()
                 return queryset.model
-            except Exception:
+            except AttributeError, AssertionError, TypeError:
                 pass
-        
+
         # Try serializer_class
         if hasattr(view, "serializer_class") and view.serializer_class:
             return view.serializer_class.Meta.model
-        
+
         return None
 
     def get_action_and_model(self, view: View) -> tuple[str, Model]:
