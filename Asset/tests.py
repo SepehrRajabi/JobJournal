@@ -6,7 +6,7 @@ from django.test import TestCase, override_settings
 
 from User.models import User
 
-from .models import AssetExtension, AssetGroup, AssetType, Document, VersionedDocument
+from .models import AssetExtension, AssetGroup, AssetType, Document
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -59,32 +59,31 @@ class AssetGroupLatestVersionTests(TestCase):
         self.asset_type = AssetType.objects.create(name="Resume")
         self.asset_type.supported_extensions.add(self.extension)
 
-    def _create_document(self, name):
+    def _create_document(self, name, asset_group=None):
         # Assigning a plain string (rather than a File/ContentFile) leaves the
         # FieldFile already "committed", so no actual upload/storage call
         # happens here - tests stay independent of the storage backend.
         return Document.objects.create(
-            title=name, user=self.user, asset_type=self.asset_type, file=name
+            title=name,
+            user=self.user,
+            asset_type=self.asset_type,
+            asset_group=asset_group,
+            file=name,
         )
 
     def test_latest_version_returns_most_recently_linked_document(self):
         group = AssetGroup.objects.create(name="CV")
-        older = self._create_document("resume-v1.pdf")
-        newer = self._create_document("resume-v2.pdf")
-
-        VersionedDocument.objects.create(asset_group=group, document=older)
-        VersionedDocument.objects.create(asset_group=group, document=newer)
+        self._create_document("resume-v1.pdf", asset_group=group)
+        newer = self._create_document("resume-v2.pdf", asset_group=group)
 
         self.assertEqual(group.get_latest_version(), newer)
 
     def test_latest_version_reflects_newly_linked_document(self):
         group = AssetGroup.objects.create(name="CV")
-        first = self._create_document("resume-v1.pdf")
-        VersionedDocument.objects.create(asset_group=group, document=first)
+        first = self._create_document("resume-v1.pdf", asset_group=group)
         self.assertEqual(group.get_latest_version(), first)
 
-        second = self._create_document("resume-v2.pdf")
-        VersionedDocument.objects.create(asset_group=group, document=second)
+        second = self._create_document("resume-v2.pdf", asset_group=group)
         self.assertEqual(group.get_latest_version(), second)
 
     def test_latest_version_returns_none_for_empty_group(self):

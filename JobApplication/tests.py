@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from Asset.models import AssetExtension, AssetGroup, AssetType, Document, VersionedDocument
+from Asset.models import AssetExtension, AssetGroup, AssetType, Document
 from User.models import User
 
 from .models import JobApplication
@@ -63,11 +63,13 @@ class JobApplicationResumeFreezeTests(TestCase):
         self.cv_group = AssetGroup.objects.create(name="CV")
 
     def _link_new_version(self, name):
-        document = Document.objects.create(
-            title=name, user=self.user, asset_type=self.asset_type, file=name
+        return Document.objects.create(
+            title=name,
+            user=self.user,
+            asset_type=self.asset_type,
+            asset_group=self.cv_group,
+            file=name,
         )
-        VersionedDocument.objects.create(asset_group=self.cv_group, document=document)
-        return document
 
     def _create_application(self, **overrides):
         data = {

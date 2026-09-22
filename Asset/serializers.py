@@ -33,7 +33,40 @@ class AssetTypeDeleteSerializer(serializers.ModelSerializer):
         fields = ["id"]
 
 
+class AssetGroupDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetGroup
+        fields = ["id", "name", "created_at", "updated_at"]
+
+
+class AssetGroupsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetGroup
+        fields = ["id", "name", "created_at", "updated_at"]
+
+
+class AssetGroupCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetGroup
+        fields = ["id", "name", "created_at", "updated_at"]
+
+
+class AssetGroupUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetGroup
+        fields = ["id", "name", "created_at", "updated_at"]
+
+
+class AssetGroupDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetGroup
+        fields = ["id"]
+
+
 class DocumentDetailSerializer(serializers.ModelSerializer):
+    asset_type = AssetTypeDetailSerializer()
+    asset_group = AssetGroupDetailSerializer()
+
     class Meta:
         model = Document
         fields = [
@@ -41,6 +74,7 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
             "title",
             "user",
             "asset_type",
+            "asset_group",
             "file",
             "created_at",
             "updated_at",
@@ -55,6 +89,7 @@ class DocumentsListSerializer(serializers.ModelSerializer):
             "title",
             "user",
             "asset_type",
+            "asset_group",
             "file",
             "created_at",
             "updated_at",
@@ -69,6 +104,7 @@ class DocumentCreateSerializer(serializers.ModelSerializer):
             "title",
             "user",
             "asset_type",
+            "asset_group",
             "file",
             "created_at",
             "updated_at",
@@ -83,6 +119,7 @@ class DocumentUpdateSerializer(serializers.ModelSerializer):
             "title",
             "user",
             "asset_type",
+            "asset_group",
             "file",
             "created_at",
             "updated_at",
@@ -92,34 +129,4 @@ class DocumentUpdateSerializer(serializers.ModelSerializer):
 class DocumentDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ["id"]
-
-
-class AssetGroupDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AssetGroup
-        fields = ["id", "name", "assets", "created_at", "updated_at"]
-
-
-class AssetGroupsListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AssetGroup
-        fields = ["id", "name", "assets", "created_at", "updated_at"]
-
-
-class AssetGroupCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AssetGroup
-        fields = ["id", "name", "assets", "created_at", "updated_at"]
-
-
-class AssetGroupUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AssetGroup
-        fields = ["id", "name", "assets", "created_at", "updated_at"]
-
-
-class AssetGroupDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AssetGroup
         fields = ["id"]

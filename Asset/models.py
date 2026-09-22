@@ -79,6 +79,16 @@ class Document(models.Model):
         on_delete=models.SET_NULL,
         related_name="documents",
     )
+    # The versioned "slot" this document is a version of (e.g. "CV"). A
+    # document belongs to at most one group; created_at is what orders
+    # versions within it - see AssetGroup.get_latest_version().
+    asset_group = models.ForeignKey(
+        "AssetGroup",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="documents",
+    )
     file = models.FileField(null=True, blank=True, upload_to=create_asset_upload_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -98,37 +108,6 @@ class Document(models.Model):
         super().save(*args, **kwargs)
 
 
-class VersionedDocument(models.Model):
-    id = models.UUIDField(
-        default=uuid4,
-        unique=True,
-        editable=False,
-        db_index=True,
-        primary_key=True,
-        null=False,
-    )
-    asset_group = models.ForeignKey(
-        "AssetGroup",
-        on_delete=models.CASCADE,
-        related_name="asset_links",
-    )
-    document = models.ForeignKey(
-        Document, on_delete=models.CASCADE, related_name="versions"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["asset_group", "document"],
-                name="unique_asset_group_document",
-            )
-        ]
-
-    def __str__(self) -> str:
-        return f"{self.asset_group.name} - {self.document.title}"
-
-
 class AssetGroup(models.Model):
     id = models.UUIDField(
         default=uuid4,
@@ -139,13 +118,6 @@ class AssetGroup(models.Model):
         null=False,
     )
     name = models.CharField(max_length=255, blank=True, null=True)
-    assets = models.ManyToManyField(
-        Document,
-        blank=True,
-        through=VersionedDocument,
-        through_fields=("asset_group", "document"),
-        related_name="asset_groups",
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -153,5 +125,4 @@ class AssetGroup(models.Model):
         return f"{self.name}"
 
     def get_latest_version(self) -> Document | None:
-        latest_link = self.asset_links.order_by(F("created_at").desc()).first()
-        return latest_link.document if latest_link else None
+        return self.documents.order_by(F("created_at").desc()).first()
