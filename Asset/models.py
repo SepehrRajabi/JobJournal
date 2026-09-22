@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
+from django.db.models import F
 from jsonschema import ValidationError
 
 
@@ -153,5 +154,5 @@ class AssetGroup(models.Model):
 
     @property
     def latest_version(self) -> Document | None:
-        latest_link = self.asset_links.order_by("-created_at").first()
+        latest_link = self.asset_links.order_by(F("created_at").desc()).first()
         return latest_link.document if latest_link else None
