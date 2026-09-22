@@ -1,9 +1,9 @@
 from uuid import uuid4
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F
-from jsonschema import ValidationError
 
 
 def create_asset_upload_path(instance, filename):
@@ -26,7 +26,7 @@ class AssetExtension(models.Model):
     def save(self, *args, **kwargs):
         if self.extension.startswith("."):
             self.extension = self.extension.replace(".", "", count=1)
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         if self.extension.startswith("."):
@@ -95,7 +95,7 @@ class Document(models.Model):
                 "Uploaded file's extension does not belong to the specified asset type"
             )
 
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class VersionedDocument(models.Model):
@@ -152,7 +152,6 @@ class AssetGroup(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-    @property
-    def latest_version(self) -> Document | None:
+    def get_latest_version(self) -> Document | None:
         latest_link = self.asset_links.order_by(F("created_at").desc()).first()
         return latest_link.document if latest_link else None

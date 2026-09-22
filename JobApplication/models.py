@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from Asset.models import AssetGroup
+from Asset.models import Document
 from Client.models import Client
 
 
@@ -138,8 +138,13 @@ class JobApplication(models.Model):
 
     deadline = models.DateField(null=True, blank=True)
 
+    # Frozen at submission time: the specific Document version that was
+    # actually used, not a live pointer to the asset group's latest version.
+    # See JobApplicationCreateSerializer/JobApplicationUpdateSerializer,
+    # which accept an AssetGroup id and resolve it to that group's
+    # latest_version Document at the time of the request.
     resume = models.ForeignKey(
-        AssetGroup,
+        Document,
         null=True,
         blank=True,
         related_name="+",
@@ -147,7 +152,7 @@ class JobApplication(models.Model):
     )
 
     cover_letter = models.ForeignKey(
-        AssetGroup,
+        Document,
         null=True,
         blank=True,
         related_name="+",

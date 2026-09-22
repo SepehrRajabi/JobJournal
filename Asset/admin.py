@@ -49,6 +49,10 @@ class DocumentInAdmin(admin.ModelAdmin):
         "updated_at",
     ]
 
+    search_fields = [
+        "title",
+    ]
+
 
 admin.site.register(Document, DocumentInAdmin)
 
