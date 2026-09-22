@@ -42,6 +42,7 @@ admin.site.register(AssetType, AssetTypeInAdmin)
 class DocumentInAdmin(admin.ModelAdmin):
     list_display = [
         "id",
+        "title",
         "asset_type",
         "user",
         "created_at",
