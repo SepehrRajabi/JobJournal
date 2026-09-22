@@ -6,7 +6,7 @@ from jsonschema import ValidationError
 
 
 def create_asset_upload_path(instance, filename):
-    return f"assets/{instance.file.name}"
+    return f"assets/{filename}"
 
 
 class AssetExtension(models.Model):

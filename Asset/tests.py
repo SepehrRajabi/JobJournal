@@ -1,8 +1,50 @@
-from django.test import TestCase
+import shutil
+import tempfile
+
+from django.core.files.base import ContentFile
+from django.test import TestCase, override_settings
 
 from User.models import User
 
 from .models import AssetExtension, AssetGroup, AssetType, Document, VersionedDocument
+
+TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+
+@override_settings(
+    MEDIA_ROOT=TEMP_MEDIA_ROOT,
+    STORAGES={
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    },
+)
+class CreateAssetUploadPathTests(TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="Test",
+            last_name="User",
+            email="test@example.com",
+            password="password123",
+        )
+        self.extension = AssetExtension.objects.create(extension="pdf")
+        self.asset_type = AssetType.objects.create(name="Resume")
+        self.asset_type.supported_extensions.add(self.extension)
+
+    def test_uploaded_file_is_stored_under_its_own_filename(self):
+        document = Document(
+            title="resume", user=self.user, asset_type=self.asset_type
+        )
+        document.file.save(
+            "resume-v1.pdf", ContentFile(b"content"), save=False
+        )
+        document.save()
+
+        self.assertEqual(document.file.name, "assets/resume-v1.pdf")
 
 
 class AssetGroupLatestVersionTests(TestCase):
