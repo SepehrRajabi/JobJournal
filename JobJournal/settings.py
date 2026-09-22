@@ -176,15 +176,17 @@ SIMPLE_JWT = {
 }
 
 
-# MINIO
+# RUSTFS
+# S3-compatible object storage, run locally with:
+#   rustfs server --address :9000 --access-key <key> --secret-key <secret> <data-dir>
 
 # STORAGES = {
 #     "default": {
 #         "BACKEND": "storages.backends.s3.S3Storage",
 #         "OPTIONS": {
 #             "bucket_name": "jobtracker-media",
-#             "access_key": "minioadmin",
-#             "secret_key": "minioadmin",
+#             "access_key": "rustfsadmin",
+#             "secret_key": "rustfsadmin",
 #             "endpoint_url": "http://127.0.0.1:9000",
 #             "region_name": "us-east-1",
 #             "default_acl": None,
@@ -197,19 +199,19 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "access_key": environ.get("JOBJOURNAL_MINIO_STORAGE_ACCESS_KEY"),
-            "secret_key": environ.get("JOBJOURNAL_MINIO_STORAGE_SECRET_KEY"),
-            "endpoint_url": environ.get("JOBJOURNAL_MINIO_STORAGE_ENDPOINT_URL"),
-            "bucket_name": environ.get("JOBJOURNAL_MINIO_STORAGE_STATIC_BUCKET_NAME"),
+            "access_key": environ.get("JOBJOURNAL_RUSTFS_STORAGE_ACCESS_KEY"),
+            "secret_key": environ.get("JOBJOURNAL_RUSTFS_STORAGE_SECRET_KEY"),
+            "endpoint_url": environ.get("JOBJOURNAL_RUSTFS_STORAGE_ENDPOINT_URL"),
+            "bucket_name": environ.get("JOBJOURNAL_RUSTFS_STORAGE_STATIC_BUCKET_NAME"),
         },
     },
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "access_key": environ.get("JOBJOURNAL_MINIO_STORAGE_ACCESS_KEY"),
-            "secret_key": environ.get("JOBJOURNAL_MINIO_STORAGE_SECRET_KEY"),
-            "endpoint_url": environ.get("JOBJOURNAL_MINIO_STORAGE_ENDPOINT_URL"),
-            "bucket_name": environ.get("JOBJOURNAL_MINIO_STORAGE_BUCKET_NAME"),
+            "access_key": environ.get("JOBJOURNAL_RUSTFS_STORAGE_ACCESS_KEY"),
+            "secret_key": environ.get("JOBJOURNAL_RUSTFS_STORAGE_SECRET_KEY"),
+            "endpoint_url": environ.get("JOBJOURNAL_RUSTFS_STORAGE_ENDPOINT_URL"),
+            "bucket_name": environ.get("JOBJOURNAL_RUSTFS_STORAGE_BUCKET_NAME"),
         },
     },
 }
