@@ -59,9 +59,25 @@ class OpportunityDetailAPIView(generics.RetrieveAPIView):
     serializer_class = OpportunityDetailSerializer
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="title",
+            description="Title of the opportunity",
+            type=OpenApiTypes.STR,
+        )
+    ]
+)
 class OppurtunitiesListAPIView(generics.ListAPIView):
-    queryset = Opportunity.objects.all()
     serializer_class = OppurtunitiesListSerializer
+
+    def get_queryset(self):
+        opportunities = Opportunity.objects.all()
+
+        if title := self.request.query_params.get("title"):
+            opportunities = opportunities.filter(title=title)
+
+        return opportunities
 
 
 class OpportunityCreateAPIView(generics.CreateAPIView):
@@ -84,6 +100,15 @@ class JobApplicationStatusDetailAPIView(generics.RetrieveAPIView):
     serializer_class = JobApplicationStatusDetailSerializer
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="title",
+            type=OpenApiTypes.STR,
+            description="Title of the Job Application Status",
+        ),
+    ]
+)
 class JobApplicationStatusesListAPIView(generics.ListAPIView):
     queryset = JobApplicationStatus.objects.all()
     serializer_class = JobApplicationStatusesListSerializer
@@ -109,9 +134,87 @@ class JobApplicationDetailAPIView(generics.RetrieveAPIView):
     serializer_class = JobApplicationDetailSerializer
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="title",
+            type=OpenApiTypes.STR,
+            description="Title of the Job Application",
+        ),
+        OpenApiParameter(
+            name="user",
+            type=OpenApiTypes.UUID,
+            description="User ID of the Job Application",
+        ),
+        OpenApiParameter(
+            name="client",
+            type=OpenApiTypes.UUID,
+            description="Client ID of the Job Application",
+        ),
+        OpenApiParameter(
+            name="opportunity",
+            type=OpenApiTypes.UUID,
+            description="Opportunity ID of the Job Application",
+        ),
+        OpenApiParameter(
+            name="location",
+            type=OpenApiTypes.STR,
+            description="Location of the Job Application",
+        ),
+        OpenApiParameter(
+            name="employment_type",
+            type=OpenApiTypes.STR,
+            description="Employment Type of the Job Application",
+        ),
+        OpenApiParameter(
+            name="work_mode",
+            type=OpenApiTypes.STR,
+            description="Work Mode of the Job Application",
+        ),
+        OpenApiParameter(
+            name="source",
+            type=OpenApiTypes.STR,
+            description="Source of the Job Application",
+        ),
+        OpenApiParameter(
+            name="job_url",
+            type=OpenApiTypes.STR,
+            description="Job URL of the Job Application",
+        ),
+        OpenApiParameter(
+            name="status",
+            type=OpenApiTypes.UUID,
+            description="Status ID of the Job Application",
+        ),
+        OpenApiParameter(
+            name="applied_at_range",
+            type=OpenApiTypes.DATE,
+            description="Applied At date range of the Job Application",
+        ),
+    ]
+)
 class JobApplicationsListAPIView(generics.ListAPIView):
-    queryset = JobApplication.objects.all()
     serializer_class = JobApplicationsListSerializer
+
+    def get_queryset(self):
+        applications = JobApplication.objects.all()
+
+        if title := self.request.query_params.get("title"):
+            applications = applications.filter(title=title)
+
+        if user_id := self.request.query_params.get("user"):
+            applications = applications.filter(user__id=user_id)
+
+        if client_id := self.request.query_params.get("client"):
+            applications = applications.filter(client__id=client_id)
+
+        if opportunity_id := self.request.query_params.get("opportunity"):
+            applications = applications.filter(opportunity__id=opportunity_id)
+
+        if location := self.request.query_params.get("location"):
+            applications = applications.filter(location=location)
+
+        return applications
 
 
 class JobApplicationCreateAPIView(generics.CreateAPIView):
