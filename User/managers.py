@@ -20,7 +20,7 @@ class UserManager(BaseUserManager):
         if not last_name:
             raise ValueError("last name must be providede")
 
-        user = self.model(first_name=first_name, last_name=last_name, *args, **kwargs)
+        user = self.model(*args, first_name=first_name, last_name=last_name, **kwargs)
         user.set_password(password)
         user.is_superuser = is_superuser
         user.is_admin = is_admin
@@ -42,6 +42,7 @@ class UserManager(BaseUserManager):
         **kwargs,
     ):
         return self.create_user(
+            *args,
             first_name=first_name,
             last_name=last_name,
             password=password,
@@ -49,6 +50,5 @@ class UserManager(BaseUserManager):
             is_admin=is_admin,
             is_staff=is_staff,
             is_active=is_active,
-            *args,
             **kwargs,
         )
