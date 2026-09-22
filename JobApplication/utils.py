@@ -4,19 +4,20 @@ from django.utils import timezone
 from .models import JobApplication
 
 
-def parse_time_window(time_window: str):
-    """_summary_
+def parse_time_window(time_window: str, sep: str = "-") -> tuple[str, str]:
+    """Parses time window string into lower and upper date bounds.
 
     Args:
         time_window (str): dash-separated string representing the time window (e.g., "2023-01-01 - 2023-12-31").
+        sep (str): The separator string (default is "-").
     """
 
-    if "-" not in time_window:
+    if sep not in time_window:
         raise ValueError(
             "Invalid time window format. Please provide a dash-separated string (e.g., '2023-01-01 - 2023-12-31')."
         )
 
-    lower, upper = time_window.split("-")
+    lower, upper = time_window.split(sep)
 
     lower = lower.strip() if lower is not None else None
     upper = upper.strip() if upper is not None else None
