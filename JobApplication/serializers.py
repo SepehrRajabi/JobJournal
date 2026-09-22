@@ -3,6 +3,7 @@ from django.db.models import F
 from rest_framework import serializers
 from rest_framework.fields import UUIDField
 
+from Asset.models import AssetGroup
 from User.serializers import UserDetailSerializer
 
 from .models import (
@@ -16,6 +17,29 @@ from .models import (
 )
 
 User = get_user_model()
+
+
+class AssetGroupLatestVersionField(serializers.PrimaryKeyRelatedField):
+    """
+    Accepts an AssetGroup id and resolves it to that group's
+    get_latest_version() Document at the time of the request, freezing
+    "which version did we actually use" onto the JobApplication rather than
+    leaving it as a live pointer that would silently change if a newer
+    version is uploaded later.
+    """
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault("queryset", AssetGroup.objects.all())
+        super().__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        group = super().to_internal_value(data)
+        document = group.get_latest_version()
+        if document is None:
+            raise serializers.ValidationError(
+                "Selected asset group has no versions yet."
+            )
+        return document
 
 
 class OpportunityDetailSerializer(serializers.ModelSerializer):
@@ -165,6 +189,16 @@ class JobApplicationCreateSerializer(serializers.ModelSerializer):
         allow_null=True,
         pk_field=UUIDField(format="hex_verbose"),
     )
+    resume = AssetGroupLatestVersionField(
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    cover_letter = AssetGroupLatestVersionField(
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
 
     class Meta:
         model = JobApplication
@@ -207,6 +241,16 @@ class JobApplicationUpdateSerializer(serializers.ModelSerializer):
     )
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    resume = AssetGroupLatestVersionField(
+        required=False,
+        allow_null=True,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+    cover_letter = AssetGroupLatestVersionField(
         required=False,
         allow_null=True,
         pk_field=UUIDField(format="hex_verbose"),

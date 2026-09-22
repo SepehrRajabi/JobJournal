@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AssetExtension, AssetGroup, AssetType, Document, VersionedDocument
+from .models import AssetExtension, AssetGroup, AssetType, Document
 
 
 class AssetExtensionInAdmin(admin.ModelAdmin):
@@ -42,27 +42,22 @@ admin.site.register(AssetType, AssetTypeInAdmin)
 class DocumentInAdmin(admin.ModelAdmin):
     list_display = [
         "id",
+        "title",
         "asset_type",
+        "asset_group",
         "user",
         "created_at",
         "updated_at",
     ]
 
-
-admin.site.register(Document, DocumentInAdmin)
-
-
-class VersionedDocumentInAdmin(admin.ModelAdmin):
-    list_display = [
-        "id",
-        "document",
-        "created_at",
+    search_fields = [
+        "title",
     ]
 
-    ordering = ["created_at"]
+    autocomplete_fields = ["asset_group"]
 
 
-admin.site.register(VersionedDocument, VersionedDocumentInAdmin)
+admin.site.register(Document, DocumentInAdmin)
 
 
 class AssetGroupInAdmin(admin.ModelAdmin):
@@ -74,8 +69,6 @@ class AssetGroupInAdmin(admin.ModelAdmin):
     search_fields = [
         "name",
     ]
-
-    # filter_horizontal = ["assets"]
 
 
 admin.site.register(AssetGroup, AssetGroupInAdmin)

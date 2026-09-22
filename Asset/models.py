@@ -1,12 +1,13 @@
 from uuid import uuid4
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
-from jsonschema import ValidationError
+from django.db.models import F
 
 
 def create_asset_upload_path(instance, filename):
-    return f"assets/{instance.file.name}"
+    return f"assets/{filename}"
 
 
 class AssetExtension(models.Model):
@@ -25,7 +26,7 @@ class AssetExtension(models.Model):
     def save(self, *args, **kwargs):
         if self.extension.startswith("."):
             self.extension = self.extension.replace(".", "", count=1)
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         if self.extension.startswith("."):
@@ -78,6 +79,16 @@ class Document(models.Model):
         on_delete=models.SET_NULL,
         related_name="documents",
     )
+    # The versioned "slot" this document is a version of (e.g. "CV"). A
+    # document belongs to at most one group; created_at is what orders
+    # versions within it - see AssetGroup.get_latest_version().
+    asset_group = models.ForeignKey(
+        "AssetGroup",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="documents",
+    )
     file = models.FileField(null=True, blank=True, upload_to=create_asset_upload_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -94,38 +105,7 @@ class Document(models.Model):
                 "Uploaded file's extension does not belong to the specified asset type"
             )
 
-        return super().save(*args, **kwargs)
-
-
-class VersionedDocument(models.Model):
-    id = models.UUIDField(
-        default=uuid4,
-        unique=True,
-        editable=False,
-        db_index=True,
-        primary_key=True,
-        null=False,
-    )
-    asset_group = models.ForeignKey(
-        "AssetGroup",
-        on_delete=models.CASCADE,
-        related_name="asset_links",
-    )
-    document = models.ForeignKey(
-        Document, on_delete=models.CASCADE, related_name="versions"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["asset_group", "document"],
-                name="unique_asset_group_document",
-            )
-        ]
-
-    def __str__(self) -> str:
-        return f"{self.asset_group.name} - {self.document.title}"
+        super().save(*args, **kwargs)
 
 
 class AssetGroup(models.Model):
@@ -138,15 +118,11 @@ class AssetGroup(models.Model):
         null=False,
     )
     name = models.CharField(max_length=255, blank=True, null=True)
-    assets = models.ManyToManyField(
-        Document,
-        blank=True,
-        through=VersionedDocument,
-        through_fields=("asset_group", "document"),
-        related_name="asset_groups",
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name}"
+
+    def get_latest_version(self) -> Document | None:
+        return self.documents.order_by(F("created_at").desc()).first()
