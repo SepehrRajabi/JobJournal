@@ -150,3 +150,8 @@ class AssetGroup(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+    @property
+    def latest_version(self) -> Document | None:
+        latest_link = self.asset_links.order_by("-created_at").first()
+        return latest_link.document if latest_link else None
