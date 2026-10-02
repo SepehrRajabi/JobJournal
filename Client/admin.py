@@ -38,16 +38,21 @@ class ClientInAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "name",
+        "type",
         "contact_info",
         "created_at",
     ]
+    list_filter = [
+        "type",
+    ]
     search_fields = [
         "name",
-        # "client_type__title",
+        "type__title",
         # "contact_info__website",
         # "contact_info__email",
         # "contact_info__phone",
     ]
+    autocomplete_fields = ["type"]
 
 
 admin.site.register(Client, ClientInAdmin)

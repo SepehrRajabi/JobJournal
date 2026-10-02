@@ -96,6 +96,13 @@ class Client(models.Model):
     contact_info = models.OneToOneField(
         ClientContactInfo, null=True, blank=True, on_delete=models.SET_NULL
     )
+    type = models.ForeignKey(
+        ClientType,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="clients",
+    )
     created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
