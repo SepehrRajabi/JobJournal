@@ -1,15 +1,17 @@
 from django.db.models import F
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from .models import NotificationDispatch
 from .serializers import DispatchedNotificationSerializer
 
 
-class UserNotificationsListAPIView(ListAPIView):
+class UserUnreadNotificationsListAPIView(ListAPIView):
     """
-    API view to retrieve a list of notifications for the authenticated user.
+    API view to retrieve a list of unread notifications for the authenticated user.
     """
 
+    permission_classes = [IsAuthenticated]
     serializer_class = DispatchedNotificationSerializer
 
     def get_queryset(self):

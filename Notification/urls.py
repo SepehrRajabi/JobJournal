@@ -1,13 +1,13 @@
 from django.urls import path
 
-from .views import UserNotificationsListAPIView
+from .views import UserUnreadNotificationsListAPIView
 
 app_name = "User"
 
 urlpatterns = [
     path(
         "unread-notifications/",
-        UserNotificationsListAPIView.as_view(),
+        UserUnreadNotificationsListAPIView.as_view(),
         name="user-unread-notifications-list",
     )
 ]
