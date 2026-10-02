@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import QuerySet, models
 
 
 class Notification(models.Model):
@@ -56,6 +56,29 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.subject_type} - {self.subject_id}"
+
+    def dispatch_for_users(self, recipients: QuerySet, redispatch: bool = False):
+        if not recipients.exists():
+            return
+
+        # Dispatch notification to recipients
+        for recipient in recipients.iterator():
+            if (
+                NotificationDispatch.objects.filter(
+                    recipient=recipient, notification=self
+                )
+                .distinct("notification", "recipient")
+                .exists()
+                and redispatch
+            ):
+                NotificationDispatch.objects.create(
+                    recipient=recipient, notification=self
+                )
+
+            else:
+                NotificationDispatch.objects.get_or_create(
+                    recipient=recipient, notification=self
+                )
 
 
 class NotificationDispatch(models.Model):
