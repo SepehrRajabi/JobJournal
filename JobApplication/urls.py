@@ -38,6 +38,7 @@ from .views import (
     OpportunityUpdateAPIView,
     OppurtunitiesListAPIView,
     UpcomingInterviewsListAPIView,
+    UpcomingOffersListAPIView,
 )
 
 app_name = "JobApplication"
@@ -222,6 +223,11 @@ urlpatterns = [
         "upcoming-interviews/",
         UpcomingInterviewsListAPIView.as_view(),
         name="upcoming-interviews-list",
+    ),
+    path(
+        "upcoming-offers/",
+        UpcomingOffersListAPIView.as_view(),
+        name="upcoming-offers-list",
     ),
     path(
         "job-application/history/<uuid:pk>/",

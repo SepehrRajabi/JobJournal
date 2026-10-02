@@ -12,6 +12,7 @@ from .models import (
     InterviewStageType,
     JobApplication,
     JobApplicationStatus,
+    Offer,
     Opportunity,
 )
 from .serializers import (
@@ -45,6 +46,7 @@ from .serializers import (
     JobApplicationStatusesListSerializer,
     JobApplicationStatusUpdateSerializer,
     JobApplicationUpdateSerializer,
+    OffersListSerializer,
     OpportunityCreateSerializer,
     OpportunityDeleteSerializer,
     OpportunityDetailSerializer,
@@ -362,6 +364,45 @@ class UpcomingInterviewsListAPIView(generics.ListAPIView):
             interviews = interviews.filter(scheduled_at=scheduled_at)
 
         return interviews
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="start_date",
+            type=OpenApiTypes.DATE,
+            description="Start date of the Offer",
+        ),
+        OpenApiParameter(
+            name="decision_deadline",
+            type=OpenApiTypes.DATE,
+            description="Decision deadline of the Offer",
+        ),
+    ]
+)
+class UpcomingOffersListAPIView(generics.ListAPIView):
+    serializer_class = OffersListSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self):
+        offers = (
+            Offer.objects.select_related("application", "application__user")
+            .filter(
+                application__user=self.request.user,
+                start_date__gte=timezone.localtime(timezone.now()).date(),
+            )
+            .order_by(F("start_date").asc(nulls_last=True))
+        )
+
+        if start_date := self.request.query_params.get("start_date"):
+            offers = offers.filter(start_date=start_date)
+
+        if decision_deadline := self.request.query_params.get("decision_deadline"):
+            offers = offers.filter(decision_deadline=decision_deadline)
+
+        return offers
 
 
 class JobApplicationTimelineAPIView(generics.RetrieveAPIView):
