@@ -1,3 +1,5 @@
+from itertools import pairwise
+
 from django.db.models import F
 from django.utils import timezone
 
@@ -32,45 +34,40 @@ def parse_time_window(time_window: str, sep: str = "-") -> tuple[str, str]:
 
 def get_job_application_history(job_application: JobApplication) -> list:
     """
-    Get the history of a job application, including changes to its fields and related tags.
+    Get the history of a job application, including changes to its fields.
+
+    History is ordered most-recent-first. The initial creation snapshot has
+    no previous record to diff against, so it's naturally excluded.
 
     Args:
         job_application (JobApplication): The job application instance.
     Returns:
         list: A list of historical records.
     """
-    history = job_application.history.all().order_by(
-        F("history_date").desc(nulls_last=True)
+    records = list(
+        job_application.history.all().order_by(F("history_date").asc(nulls_last=True))
     )
+
     history_data = []
+    for previous_record, record in pairwise(records):
+        diff = record.diff_against(previous_record, foreign_keys_are_objs=True)
+        changes = {
+            field.field: {
+                "old": None if field.old is None else str(field.old),
+                "new": None if field.new is None else str(field.new),
+            }
+            for field in diff.changes
+        }
 
-    record = history.first()
-    while record is not None:
-        previous_record = record.prev_record
+        history_data.append(
+            {
+                "history_date": timezone.localtime(record.history_date),
+                "history_user": f"{record.history_user.first_name} {record.history_user.last_name}"
+                if record.history_user
+                else None,
+                "changes": changes,
+            }
+        )
 
-        if previous_record is not None:
-            changes = {}
-            for field in record.diff_against(
-                previous_record, foreign_keys_are_objs=True
-            ).changes:
-                changes[field.field] = {
-                    "old": field.old.title if hasattr(field.old, "title") else None,
-                    "new": field.new.title if hasattr(field.new, "title") else None,
-                }
-
-            # tag_titles = [tag.title for tag in record.instance.tags.all()]
-
-            history_data.append(
-                {
-                    "history_date": timezone.localtime(record.history_date),
-                    "history_user": f"{record.history_user.first_name} {record.history_user.last_name}"
-                    if record.history_user
-                    else None,
-                    "changes": changes,
-                    # "tags": tag_titles,
-                }
-            )
-
-        record = record.next_record
-
+    history_data.reverse()
     return history_data

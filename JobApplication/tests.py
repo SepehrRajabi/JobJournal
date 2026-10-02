@@ -41,6 +41,34 @@ class JobApplicationHistoryTests(TestCase):
             history[0]["changes"]["title"]["new"], "Senior Backend Engineer"
         )
 
+    def test_get_job_application_history_returns_every_edit_not_just_the_latest(self):
+        application = JobApplication.objects.create(
+            user=self.user,
+            title="Backend Engineer",
+            location="Remote",
+            employment_type="Full-time",
+            work_mode="Remote",
+            source="LinkedIn",
+            job_url="https://example.com/job/1",
+        )
+
+        application.title = "Senior Backend Engineer"
+        application.save()
+
+        application.location = "Berlin"
+        application.save()
+
+        history = get_job_application_history(application)
+
+        self.assertEqual(len(history), 2)
+        # most-recent-first
+        self.assertEqual(history[0]["changes"]["location"]["old"], "Remote")
+        self.assertEqual(history[0]["changes"]["location"]["new"], "Berlin")
+        self.assertEqual(history[1]["changes"]["title"]["old"], "Backend Engineer")
+        self.assertEqual(
+            history[1]["changes"]["title"]["new"], "Senior Backend Engineer"
+        )
+
 
 class JobApplicationResumeFreezeTests(TestCase):
     """
