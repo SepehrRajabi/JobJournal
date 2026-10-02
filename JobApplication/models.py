@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from simple_history.models import HistoricalRecords
 
@@ -165,12 +166,61 @@ class JobApplication(models.Model):
 
     notes = models.TextField(blank=True)
 
+    is_accepted = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     history = HistoricalRecords(m2m_fields=[tags])
 
     def __str__(self):
         return f"{self.title}"
+
+
+class Offer(models.Model):
+    id = models.UUIDField(
+        default=uuid4,
+        editable=False,
+        null=False,
+        primary_key=True,
+        unique=True,
+        db_index=True,
+    )
+
+    application = models.OneToOneField(
+        JobApplication,
+        on_delete=models.CASCADE,
+        related_name="offer",
+    )
+
+    salary = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    currency = models.CharField(max_length=10, default="EUR")
+
+    start_date = models.DateField(null=True, blank=True)
+
+    decision_deadline = models.DateField(null=True, blank=True)
+
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if not self.application.is_accepted:
+            raise ValidationError(
+                {"application": "An offer can only be linked to an accepted job application."}
+            )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Offer - {self.application.title}"
 
 
 class InterviewStageStatus(models.Model):

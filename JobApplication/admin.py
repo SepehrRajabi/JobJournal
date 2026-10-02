@@ -8,6 +8,7 @@ from .models import (
     InterviewStageType,
     JobApplication,
     JobApplicationStatus,
+    Offer,
     Opportunity,
 )
 
@@ -84,6 +85,7 @@ class JobApplicationInAdmin(SimpleHistoryAdmin):
         "employment_type",
         "work_mode",
         "applied_at",
+        "is_accepted",
         "created_at",
     ]
     list_filter = [
@@ -91,6 +93,7 @@ class JobApplicationInAdmin(SimpleHistoryAdmin):
         "employment_type",
         "work_mode",
         "currency",
+        "is_accepted",
         ("applied_at", admin.DateFieldListFilter),
         ("created_at", admin.DateFieldListFilter),
     ]
@@ -176,6 +179,12 @@ class JobApplicationInAdmin(SimpleHistoryAdmin):
             },
         ),
         (
+            "Outcome",
+            {
+                "fields": ("is_accepted",),
+            },
+        ),
+        (
             "Metadata",
             {
                 "fields": ("created_at",),
@@ -190,6 +199,33 @@ class JobApplicationInAdmin(SimpleHistoryAdmin):
 
 
 admin.site.register(JobApplication, JobApplicationInAdmin)
+
+
+class OfferInAdmin(admin.ModelAdmin):
+    list_display = [
+        "application",
+        "salary",
+        "currency",
+        "start_date",
+        "decision_deadline",
+        "created_at",
+    ]
+    list_filter = [
+        "currency",
+        ("start_date", admin.DateFieldListFilter),
+        ("decision_deadline", admin.DateFieldListFilter),
+    ]
+    search_fields = [
+        "application__title",
+        "application__user__email",
+    ]
+    autocomplete_fields = ["application"]
+    readonly_fields = ["id", "created_at"]
+    list_select_related = ["application"]
+    ordering = ["-created_at"]
+
+
+admin.site.register(Offer, OfferInAdmin)
 
 
 class InterviewStageInAdmin(admin.ModelAdmin):

@@ -13,6 +13,7 @@ from .models import (
     InterviewStageType,
     JobApplication,
     JobApplicationStatus,
+    Offer,
     Opportunity,
 )
 
@@ -135,6 +136,7 @@ class JobApplicationDetailSerializer(serializers.ModelSerializer):
             "resume",
             "cover_letter",
             "notes",
+            "is_accepted",
             "created_at",
         ]
 
@@ -166,6 +168,7 @@ class JobApplicationsListSerializer(serializers.ModelSerializer):
             "resume",
             "cover_letter",
             "notes",
+            "is_accepted",
             "created_at",
         ]
 
@@ -222,6 +225,7 @@ class JobApplicationCreateSerializer(serializers.ModelSerializer):
             "resume",
             "cover_letter",
             "notes",
+            "is_accepted",
             "created_at",
         ]
 
@@ -278,6 +282,7 @@ class JobApplicationUpdateSerializer(serializers.ModelSerializer):
             "resume",
             "cover_letter",
             "notes",
+            "is_accepted",
             "created_at",
         ]
 
@@ -285,6 +290,87 @@ class JobApplicationUpdateSerializer(serializers.ModelSerializer):
 class JobApplicationDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplication
+        fields = ["id"]
+
+
+class OfferDetailSerializer(serializers.ModelSerializer):
+    application = JobApplicationsListSerializer(read_only=True)
+
+    class Meta:
+        model = Offer
+        fields = [
+            "id",
+            "application",
+            "salary",
+            "currency",
+            "start_date",
+            "decision_deadline",
+            "notes",
+            "created_at",
+        ]
+
+
+class OffersListSerializer(serializers.ModelSerializer):
+    application = JobApplicationsListSerializer(read_only=True)
+
+    class Meta:
+        model = Offer
+        fields = [
+            "id",
+            "application",
+            "salary",
+            "currency",
+            "start_date",
+            "decision_deadline",
+            "notes",
+            "created_at",
+        ]
+
+
+class OfferCreateSerializer(serializers.ModelSerializer):
+    application = serializers.PrimaryKeyRelatedField(
+        queryset=JobApplication.objects.all(),
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
+    class Meta:
+        model = Offer
+        fields = [
+            "id",
+            "application",
+            "salary",
+            "currency",
+            "start_date",
+            "decision_deadline",
+            "notes",
+            "created_at",
+        ]
+
+
+class OfferUpdateSerializer(serializers.ModelSerializer):
+    application = serializers.PrimaryKeyRelatedField(
+        queryset=JobApplication.objects.all(),
+        required=False,
+        pk_field=UUIDField(format="hex_verbose"),
+    )
+
+    class Meta:
+        model = Offer
+        fields = [
+            "id",
+            "application",
+            "salary",
+            "currency",
+            "start_date",
+            "decision_deadline",
+            "notes",
+            "created_at",
+        ]
+
+
+class OfferDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Offer
         fields = ["id"]
 
 
