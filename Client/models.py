@@ -1,3 +1,4 @@
+import re
 from uuid import uuid4
 
 from django.core.validators import RegexValidator
@@ -37,7 +38,16 @@ class ClientContactInfo(models.Model):
         db_index=True,
     )
     website = models.URLField(null=True, blank=True)
-    linkedin = models.URLField(null=True, blank=True)
+    linkedin = models.URLField(
+        null=True,
+        blank=True,
+        validators=[
+            RegexValidator(
+                regex=r"^https?://([a-z0-9-]+\.)?linkedin\.com(/.*)?$",
+                flags=re.IGNORECASE,
+            )
+        ],
+    )
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(
         max_length=20,
