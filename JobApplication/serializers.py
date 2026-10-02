@@ -374,6 +374,22 @@ class OfferDeleteSerializer(serializers.ModelSerializer):
         fields = ["id"]
 
 
+class JobApplicationStatusBreakdownSerializer(serializers.Serializer):
+    status = serializers.CharField(allow_null=True)
+    count = serializers.IntegerField()
+
+
+class JobApplicationDashboardSerializer(serializers.Serializer):
+    total_applications = serializers.IntegerField()
+    accepted_applications = serializers.IntegerField()
+    acceptance_rate = serializers.FloatField(allow_null=True)
+    total_interviews = serializers.IntegerField()
+    upcoming_interviews = serializers.IntegerField()
+    total_offers = serializers.IntegerField()
+    upcoming_offers = serializers.IntegerField()
+    applications_by_status = JobApplicationStatusBreakdownSerializer(many=True)
+
+
 class InterviewStageStatusDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewStageStatus

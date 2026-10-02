@@ -1,4 +1,4 @@
-from django.db.models import F
+from django.db.models import Count, F
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import generics, status
@@ -37,6 +37,7 @@ from .serializers import (
     InterviewStageTypeUpdateSerializer,
     InterviewStageUpdateSerializer,
     JobApplicationCreateSerializer,
+    JobApplicationDashboardSerializer,
     JobApplicationDeleteSerializer,
     JobApplicationDetailSerializer,
     JobApplicationsListSerializer,
@@ -429,3 +430,55 @@ class JobApplicationTimelineAPIView(generics.RetrieveAPIView):
             get_job_application_history(job_application=instance),
             status=status.HTTP_200_OK,
         )
+
+
+class JobApplicationDashboardAPIView(generics.GenericAPIView):
+    serializer_class = JobApplicationDashboardSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    @extend_schema(responses=JobApplicationDashboardSerializer)
+    def get(self, request, *args, **kwargs):
+        applications = JobApplication.objects.filter(user=request.user)
+
+        total_applications = applications.count()
+        accepted_applications = applications.filter(is_accepted=True).count()
+        acceptance_rate = (
+            round(accepted_applications / total_applications * 100, 2)
+            if total_applications
+            else None
+        )
+
+        interviews = InterviewStage.objects.filter(application__user=request.user)
+        total_interviews = interviews.count()
+        upcoming_interviews = interviews.filter(
+            scheduled_at__gte=timezone.now()
+        ).count()
+
+        offers = Offer.objects.filter(application__user=request.user)
+        total_offers = offers.count()
+        upcoming_offers = offers.filter(
+            start_date__gte=timezone.localtime(timezone.now()).date()
+        ).count()
+
+        applications_by_status = [
+            {"status": row["status__title"], "count": row["count"]}
+            for row in applications.values("status__title")
+            .annotate(count=Count("id"))
+            .order_by(F("count").desc())
+        ]
+
+        data = {
+            "total_applications": total_applications,
+            "accepted_applications": accepted_applications,
+            "acceptance_rate": acceptance_rate,
+            "total_interviews": total_interviews,
+            "upcoming_interviews": upcoming_interviews,
+            "total_offers": total_offers,
+            "upcoming_offers": upcoming_offers,
+            "applications_by_status": applications_by_status,
+        }
+
+        serializer = self.get_serializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)

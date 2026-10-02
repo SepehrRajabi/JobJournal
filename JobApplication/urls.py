@@ -22,6 +22,7 @@ from .views import (
     InterviewStageTypeUpdateAPIView,
     InterviewStageUpdateAPIView,
     JobApplicationCreateAPIView,
+    JobApplicationDashboardAPIView,
     JobApplicationDeleteAPIView,
     JobApplicationDetailAPIView,
     JobApplicationsListAPIView,
@@ -233,5 +234,10 @@ urlpatterns = [
         "job-application/history/<uuid:pk>/",
         JobApplicationTimelineAPIView.as_view(),
         name="job-application-history",
+    ),
+    path(
+        "dashboard/",
+        JobApplicationDashboardAPIView.as_view(),
+        name="dashboard",
     ),
 ]
