@@ -7,7 +7,7 @@ A Django REST Framework API for tracking job applications, interview stages, cli
 ## Stack
 
 - Django + Django REST Framework
-- S3-compatible object storage (RustFS) for documents, via django-storages
+- S3-compatible object storage [RustFS](https://github.com/rustfs/rustfs) for documents, via django-storages
 - `uv` for dependency management
 
 ## Getting started
