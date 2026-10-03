@@ -3,24 +3,20 @@ from uuid import uuid4
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import QuerySet, models
+from django.db import models
+from django.db.models.query import QuerySet
 
 
 class Notification(models.Model):
     class ActionChoices(models.TextChoices):
-        # TICKET_CREATE = "ticket_create", "ticket_create"
-        # TICKET_STATUS_CHANGE = "ticket_status_change", "ticket_status_change"
-
-        # TICKET_POST_CREATE = "ticket_post_create", "ticket_post_create"
-
-        # TASK_CREATE = "task_create", "task_create"
-        # TASK_STATUS_CHANGE = "task_status_change", "task_status_change"
-        # TASK_ASSIGNEE_CHANGE = "task_assignee_change", "task_assignee_change"
-
-        # TASK_COMMENT_CREATE = "task_comment_create", "task_comment_create"
-        # TASK_COMMENT_SEEN = "task_comment_seen", "task_comment_seen"
-        # TODO: add all the possible action choices.
-        pass
+        UPCOMING_INTERVIEW_REMINDER = (
+            "upcoming_interview_reminder",
+            "upcoming_interview_reminder",
+        )
+        UPCOMING_OFFER_DEADLINE_REMINDER = (
+            "upcoming_offer_deadline_reminder",
+            "upcoming_offer_deadline_reminder",
+        )
 
     id = models.UUIDField(
         default=uuid4,

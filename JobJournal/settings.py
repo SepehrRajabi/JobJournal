@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "Client",
     "JobApplication",
     "User",
+    "Notification",
     # Third party apps
     "rest_framework",
     "rest_framework_simplejwt",
