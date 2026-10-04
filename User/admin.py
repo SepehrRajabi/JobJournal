@@ -2,9 +2,12 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Permission
+from django.urls import reverse
+from django.utils.html import format_html_join
 
 from JobApplication.models import (
     JobApplication,
+    Offer,
 )
 
 User = get_user_model()
@@ -27,6 +30,7 @@ class JobApplicationInline(admin.StackedInline):
     )
     can_delete = False
     show_change_link = True
+    classes = ["collapse"]
 
 
 class UserInAdmin(UserAdmin):
@@ -46,7 +50,7 @@ class UserInAdmin(UserAdmin):
         "is_active",
     ]
 
-    readonly_fields = ("last_login",)
+    readonly_fields = ("last_login", "offers")
 
     fieldsets = (
         (
@@ -80,7 +84,35 @@ class UserInAdmin(UserAdmin):
                 )
             },
         ),
+        (
+            "Offers",
+            {
+                "fields": ("offers",),
+                "classes": ("collapse",),
+            },
+        ),
     )
+
+    @admin.display(description="Offers")
+    def offers(self, obj):
+        offers = Offer.objects.filter(application__user=obj).select_related(
+            "application"
+        )
+        if not offers:
+            return "—"
+
+        return format_html_join(
+            "",
+            '<div><a href="{}">{}</a> — deadline: {}</div>',
+            (
+                (
+                    reverse("admin:JobApplication_offer_change", args=[offer.pk]),
+                    offer.application.title,
+                    offer.decision_deadline or "—",
+                )
+                for offer in offers
+            ),
+        )
 
     add_fieldsets = (
         (
