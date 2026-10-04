@@ -1,9 +1,10 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from Asset.models import AssetExtension, AssetGroup, AssetType, Document
 from User.models import User
 
-from .models import JobApplication
+from .models import JobApplication, Offer
 from .serializers import JobApplicationCreateSerializer
 from .utils import get_job_application_history
 
@@ -148,3 +149,38 @@ class JobApplicationResumeFreezeTests(TestCase):
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("resume", serializer.errors)
+
+
+class OfferValidationTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="Test",
+            last_name="User",
+            email="test@example.com",
+            password="password123",
+        )
+
+    def _create_application(self, is_accepted):
+        return JobApplication.objects.create(
+            user=self.user,
+            title="Backend Engineer",
+            location="Remote",
+            employment_type="Full-time",
+            work_mode="Remote",
+            source="LinkedIn",
+            job_url="https://example.com/job/1",
+            is_accepted=is_accepted,
+        )
+
+    def test_offer_rejects_an_application_that_is_not_accepted(self):
+        application = self._create_application(is_accepted=False)
+
+        with self.assertRaises(ValidationError):
+            Offer.objects.create(application=application)
+
+    def test_offer_allows_an_accepted_application(self):
+        application = self._create_application(is_accepted=True)
+
+        offer = Offer.objects.create(application=application)
+
+        self.assertEqual(offer.application, application)
