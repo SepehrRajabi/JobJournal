@@ -106,6 +106,13 @@ DATABASES = {
         "PASSWORD": environ["DB_PASSWORD"],
         "HOST": environ.get("DB_HOST", "localhost"),
         "PORT": environ.get("DB_PORT", "5432"),
+        "OPTIONS": {
+            "pool": {
+                "min_size": int(environ.get("DB_POOL_MIN_SIZE", 2)),
+                "max_size": int(environ.get("DB_POOL_MAX_SIZE", 10)),
+                "timeout": int(environ.get("DB_POOL_TIMEOUT", 10)),
+            },
+        },
     }
 }
 
