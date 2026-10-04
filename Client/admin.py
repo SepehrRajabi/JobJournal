@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from JobApplication.models import JobApplication
+
 from .models import Client, ClientContactInfo, ClientType
 
 
@@ -34,6 +36,22 @@ class ClientContactInfoInAdmin(admin.ModelAdmin):
 admin.site.register(ClientContactInfo, ClientContactInfoInAdmin)
 
 
+class JobApplicationInline(admin.TabularInline):
+    model = JobApplication
+    extra = 0
+    fields = [
+        "title",
+        "status",
+        "employment_type",
+        "work_mode",
+        "applied_at",
+        "is_accepted",
+    ]
+    autocomplete_fields = ["status"]
+    ordering = ["-created_at"]
+    show_change_link = True
+
+
 class ClientInAdmin(admin.ModelAdmin):
     list_display = [
         "id",
@@ -53,6 +71,7 @@ class ClientInAdmin(admin.ModelAdmin):
         # "contact_info__phone",
     ]
     autocomplete_fields = ["type"]
+    inlines = [JobApplicationInline]
 
 
 admin.site.register(Client, ClientInAdmin)
