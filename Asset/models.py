@@ -23,9 +23,12 @@ class AssetExtension(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         if self.extension.startswith("."):
             self.extension = self.extension.replace(".", "", count=1)
+
+    def save(self, *args, **kwargs):
+        self.clean()
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
