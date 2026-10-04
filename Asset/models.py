@@ -96,7 +96,7 @@ class Document(models.Model):
     def __str__(self) -> str:
         return f"{self.file.name} {self.user.first_name} {self.user.last_name}"
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         extension = self.file.name.split(".")[-1]
         if extension not in self.asset_type.supported_extensions.values_list(
             "extension", flat=True
@@ -105,6 +105,8 @@ class Document(models.Model):
                 "Uploaded file's extension does not belong to the specified asset type"
             )
 
+    def save(self, *args, **kwargs):
+        self.clean()
         super().save(*args, **kwargs)
 
 

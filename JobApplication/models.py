@@ -57,9 +57,12 @@ class JobApplicationTag(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True, unique=True)
     color = models.CharField(max_length=7, null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.color and not self.color.startswith("#"):
+    def clean(self):
+        if self.color and not self.color.startswith("#") and len(self.color) == 6:
             self.color = f"#{self.color}"
+
+    def save(self, *args, **kwargs):
+        self.clean()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -212,7 +215,9 @@ class Offer(models.Model):
     def clean(self):
         if not self.application.is_accepted:
             raise ValidationError(
-                {"application": "An offer can only be linked to an accepted job application."}
+                {
+                    "application": "An offer can only be linked to an accepted job application."
+                }
             )
 
     def save(self, *args, **kwargs):
